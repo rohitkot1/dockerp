@@ -1,0 +1,29 @@
+name: Export Docker Image
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Pull Docker image
+        run: docker pull python:3.12
+
+      - name: Export Docker image
+        run: docker save python:3.12 -o python_3.12.tar
+
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.repository.releases[0].upload_url }}
+          asset_path: ./python_3.12.tar
+          asset_name: python_3.12.tar
+          asset_content_type: application/x-tar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
